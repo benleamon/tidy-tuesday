@@ -1,0 +1,57 @@
+---
+title: "jamaica-barbados"
+author: "Ben Leamon"
+date: "29/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##Load the required libraries: 
+```{r message=FALSE}
+library(tidyverse)
+library(reshape2)
+library(naniar)
+library(scales)
+library(lubridate)
+```
+
+##Get data and clean:
+Import the data. 
+```{r message=FALSE}
+hdi<- read_csv("hdi.csv")
+```
+
+Replace missing values with NA. 
+```{r}
+hdi_clean <- hdi%>% replace_with_na_all(condition = ~.x == "..")
+```
+
+Reshape the data from wide to long. 
+```{r}
+hdi_clean <- melt(hdi_clean,id=c("rank","country"))
+hdi_clean <- na.omit(hdi_clean)
+```
+
+##Begin Plotting
+```{r}
+interested <- c("Jamaica","Barbados")
+p <- ggplot(data = subset(hdi_clean, country %in% interested),
+            mapping = aes (x=as.POSIXct(strptime(variable,"%Y")),
+                           y=as.numeric(value),
+                           color=country))
+p+geom_line(aes(group=country))+
+  scale_x_datetime(labels = date_format("%Y"),
+                   breaks = date_breaks("2 years"))+
+  scale_y_continuous()+
+  expand_limits(y=0.6)+
+  labs(x=NULL,
+       y="Human Development Index",
+       color=NULL)+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+```
+
+##Odd problems
+This seemed to be working, but keen-eyed ovservers will note all the dates have been inexplicably moved forward one year. [This](https://stackoverflow.com/questions/42973629/ggplot-date-scales-shifts-one-month-forward) post recomends switching the date format, which I've then done, and which seems to fix the issue.

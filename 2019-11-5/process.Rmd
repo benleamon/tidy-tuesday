@@ -13,3 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 This is my first attempt at a Tidy Tuesday project. Let's get started. 
 
 ##Import Data:
+```{r}
+commute_mode <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-11-05/commute.csv")
+```
+
