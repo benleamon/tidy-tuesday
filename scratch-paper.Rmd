@@ -1,0 +1,49 @@
+---
+title: "scratch"
+author: "Ben Leamon"
+date: "21/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE}
+library(tidyverse)
+library(reshape2)
+library(naniar)
+library(scales)
+library(lubridate)
+library(ggalluvial)
+```
+
+# Try out some alluvial plots
+
+```{r}
+data <- read_csv("/Users/benleamon/Desktop/sankey-example.csv")
+```
+
+```{r}
+#Summarize data
+data_table <- data %>%
+  group_by(from, to) %>%
+  count()
+
+#data_table$from <- factor(data_table$from, levels = c("Uni A", "Uni B", "Uni C", "Uni D"))
+
+ggplot(data = data_table, mapping =
+         aes(axis1 = from, 
+             axis2 = to,
+             y = n))+
+  geom_alluvium()+
+  geom_stratum()+
+  geom_text(stat = "stratum",
+            infer.label = TRUE)+
+  scale_x_discrete(limits = c("Graduated from", "Hired at"),
+                   expand = c(.1,.1))+
+  labs(y="Number"
+  )+
+  theme_minimal()
+```
+
