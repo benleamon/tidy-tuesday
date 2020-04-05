@@ -92,7 +92,7 @@ textarea {
     font-family: sans-serif;
   }   
 
-  .column{
+  .column, h1, h2, p{
     grid-column: 3;
   }
   img{

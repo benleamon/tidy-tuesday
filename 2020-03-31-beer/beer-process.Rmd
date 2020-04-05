@@ -134,7 +134,7 @@ p3 <- p2 +
 p3
 ```
 
-```{r}
+```{r beer_states}
 #Load libraries
 library(tidyverse)
 library(scales)
@@ -198,7 +198,8 @@ p3 <- p2 +
     subtitle = "Includes beer in bottles and cans, kegs and barrels, and beer kept on premesis",
     caption = "Data: https://www.ttb.gov/beer/statistics",
     x = NULL,
-    y = "Barrels"
+    y = "Barrels",
+    color = "State"
   )+
   theme_ipsum()
 
