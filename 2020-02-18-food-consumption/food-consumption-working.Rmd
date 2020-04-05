@@ -1,0 +1,180 @@
+---
+title: "food-consumption-working"
+author: "Ben Leamon"
+date: "26/02/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Import data from GitHub: 
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2020-02-18')
+```
+Now I think we need to clean this up and make a proper dataframe. 
+```{r}
+library(tidyverse)
+library(janitor)
+library(rvest)
+
+# Credit to Kasia and minorly edited to create output file and test plot
+# Blog post at https://r-tastic.co.uk/post/from-messy-to-tidy/
+
+url <- "https://www.nu3.de/blogs/nutrition/food-carbon-footprint-index-2018"
+
+# scrape the website
+url_html <- read_html(url)
+
+# extract the HTML table
+whole_table <- url_html %>% 
+  html_nodes('table') %>%
+  html_table(fill = TRUE) %>%
+  .[[1]]
+
+table_content <- whole_table %>%
+  select(-X1) %>% # remove redundant column
+  filter(!dplyr::row_number() %in% 1:3) # remove redundant rows
+
+raw_headers <- url_html %>%
+  html_nodes(".thead-icon") %>%
+  html_attr('title')
+
+tidy_bottom_header <- raw_headers[28:length(raw_headers)]
+tidy_bottom_header[1:10]
+
+raw_middle_header <- raw_headers[17:27]
+raw_middle_header
+
+tidy_headers <- c(
+  rep(raw_middle_header[1:7], each = 2),
+  "animal_total",
+  rep(raw_middle_header[8:length(raw_middle_header)], each = 2),
+  "non_animal_total",
+  "country_total")
+
+tidy_headers
+
+combined_colnames <- paste(tidy_headers, tidy_bottom_header, sep = ';')
+colnames(table_content) <- c("Country", combined_colnames)
+glimpse(table_content[, 1:10])
+
+long_table <- table_content %>%
+  # make column names observations of Category variable
+  tidyr::pivot_longer(cols = -Country, names_to = "Category", values_to = "Values") %>%
+  # separate food-related information from the metric
+  tidyr::separate(col = Category, into = c("Food Category", "Metric"), sep = ';')
+
+glimpse(long_table)
+
+tidy_table <- long_table %>%
+  tidyr::pivot_wider(names_from = Metric, values_from = Values) %>%
+  janitor::clean_names('snake')
+
+glimpse(tidy_table)
+
+final_table <- tidy_table %>%
+  rename(consumption = 3,
+         co2_emmission = 4) %>%
+  filter(!stringr::str_detect(food_category, "total"))
+
+clean_table <- final_table %>% 
+  mutate_at(vars(consumption, co2_emmission), parse_number)
+
+clean_table %>% 
+  write_csv("/Users/benleamon/Documents/Infographics/projects/tidy-tuesday/2020-02-18-food-consumption/data/food-consumption-data.csv")
+
+clean_table %>% 
+  ggplot(aes(x = fct_reorder(food_category, consumption), y = consumption, color = country)) +
+  geom_jitter() +
+  theme(legend.position = "none") +
+  coord_flip()
+
+```
+Import that dataframe: 
+```{r}
+library(here)
+food_data <- read_csv(here("2020-02-18-food-consumption/data/food-consumption-data.csv"))
+```
+
+##Scaffodling for the project: 
+- Everything we eat emits c02 and contributes to climate change.
+- The amount of c02 every country's food supply generates is different. (Countries give off different amounts of Co2.)
+- Graph of countries x total c02/person from food supply 
+- 
+
+## Generate some Graphs, see what they look like.
+```{r}
+data_subset <- subset(food_data, country %in% c("Japan"))
+p <- ggplot(data = data_subset, aes(x = fct_reorder(food_category,-co2_emmission),
+                                  y = co2_emmission))
+p + geom_point() + 
+  theme_minimal()
+```
+
+Graph of all countries' emissions 
+```{r fig.width=8, fig.height=12}
+emmissions_by_country <- food_data %>%
+  group_by(country) %>%
+  summarise(total = sum(co2_emmission))
+  #Change "united kingdom" in emmissions_by_country to "UK", as it appears in world.
+emmissions_by_country$country <- as.character(emmissions_by_country$country)
+emmissions_by_country$country[emmissions_by_country$country == "United Kingdom"] <- "UK"
+emmissions_by_country$country <- as.factor(emmissions_by_country$country)
+
+p <- ggplot(data = emmissions_by_country, aes(fct_reorder(country,total),total))
+p1 <- p + geom_point()+
+  coord_flip() + 
+  theme_minimal()
+p1
+```
+
+
+Save the graphic
+```{r}
+library(here)
+ggsave(here("2020-02-18-food-consumption/figures", "co2_diet.pdf"), plot = p1, height = 15, width = 8)
+
+```
+
+
+Setting up our data for the map: 
+```{r}
+library(maps)
+world <- map_data("world")
+
+world_emmissions <- left_join(world, emmissions_by_country, by = c("region" = "country"))
+```
+
+```{r}
+theme_map <- function(base_size = 9, base_family = ""){
+  require(grid)
+  theme_bw(base_size = base_size, base_family = base_family) %+replace%
+    theme(axis.line = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title = element_blank(),
+          panel.background = element_blank(),
+          panel.border = element_blank(),
+          panel.grid = element_blank(),
+          panel.spacing = unit(0, "lines"),
+          plot.background = element_blank(),
+          legend.justification = c(0,0),
+          legend.position = c(0,0)
+          )
+}
+```
+
+
+```{r}
+p <- ggplot(data = world_emmissions, 
+            aes(x = long, y = lat, group = group, fill = total))
+p + geom_polygon( color = "gray90", size = 0.1)+ 
+  coord_map(projection = "mollweide",xlim=c(-180,180)) +
+  scale_fill_continuous(na.value = "gray") + 
+  labs(title = "Co2 Emmissions from Diet")+
+  theme_map()+
+  labs(fill = "Kg Co2/person/year")
+```
+

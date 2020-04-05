@@ -1,0 +1,213 @@
+---
+title: "beer"
+author: "Ben Leamon"
+date: "01/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load Libraries
+```{r}
+library(tidyverse)
+library(scales)
+library(here)
+library(ggrepel)
+library(hrbrthemes)
+library(gcookbook)
+
+```
+
+Import data
+```{r}
+#brewing_materials <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-31/brewing_materials.csv')
+#beer_taxed <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-31/beer_taxed.csv')
+#brewer_size <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-31/brewer_size.csv')
+beer_states <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-31/beer_states.csv')
+
+beer_states %>% write_csv(here::here("2020-03-31-beer/data", "beer_states_tidy.csv"))
+
+```
+```{r}
+beer_states <- read_csv(here::here("2020-03-31-beer/data/beer_states_tidy.csv"))
+```
+
+
+```{r}
+#beer_states$year <- as.character(beer_states$year)
+#beer_states$year <- as.Date(beer_states$year, format = "%Y")
+# library(lubridate)
+# beer_states$year <- year(beer_states$year)
+#beer_states$year <- as.Date(beer_states$year, origin = "2008-01-01")
+# strptime(as.character(beer_states$year), "%Y")
+beer_states$year <- as.Date(paste(beer_states$year, 1, 1), '%Y %m %d')
+```
+
+```{r}
+p <- ggplot(beer_states, aes(x = year,
+                             y = barrels))
+p + geom_line(aes(group = state)) +
+  facet_wrap(~ type)
+```
+
+Let's remove the total values:
+```{r}
+beer_states_no_totals <- beer_states %>%
+  #select(state, barrels)
+  filter(beer_states$state != "total")
+
+beer_states_no_totals
+
+p <- ggplot(beer_states_no_totals, aes(x = year,
+                             y = barrels))
+p + geom_line(aes(group = state)) +
+  facet_wrap(~ type)
+```
+Ok so we want to know total beer output for the states.
+
+```{r}
+total_production_by_year <- beer_states_no_totals %>%
+  group_by(state, year) %>%
+  summarize(total = sum(barrels))
+
+total_production_by_year
+```
+```{r}
+interested <-  c("CA","AK", "NY")
+
+p <- ggplot(total_production_by_year, aes(x = year, y = total))
+
+p + geom_line(aes(group=state)) + 
+  scale_y_continuous(
+    labels = scales::label_comma()
+  ) +
+  geom_text_repel(data = subset(total_production_by_year, state %in% interested & year == "2019-04-04"), aes(label = state), size = 3) +
+  labs(
+    title = "Beer Production by State",
+    subtitle = "Includes bottles and cans, kegs and barrels, and beer kept on premesis",
+    caption = "Data: https://www.ttb.gov/beer/statistics",
+    x = NULL,
+    y = "Barrels"
+  )+
+  theme_minimal()
+```
+OK this is fine, but I want to highlight the states I care about, and deemphasize those I don't. Also want to chose the ones I'm interested. 
+
+```{r}
+total_2019 <-  subset(total_production_by_year, total_production_by_year$year == "2019-01-01")
+top2019 <- head(arrange(total_2019, desc(total)), n = 5)
+interested <- top2019$state
+```
+
+
+```{r}
+
+p0 <- ggplot(total_production_by_year, aes(x = year, y = total))
+
+p1 <- p0 + geom_line(data = subset(total_production_by_year, !(state %in% interested)),
+                     aes(group = state),
+                     alpha = 0.50,
+                     color = "gray")
+
+p2 <- p1 + 
+  geom_line(data = subset(total_production_by_year, state %in% interested),aes(group=state, color = state))+
+  scale_color_brewer(palette = "Dark2")
+  #geom_text_repel(data = subset(total_production_by_year, state %in% interested & year == "2019-01-01"),aes(label = state), size = 3)
+  
+
+p3 <- p2 +
+  scale_y_continuous(
+    labels = scales::label_comma()
+  ) +
+  scale_x_date(date_labels = "%Y")+
+  labs(
+    title = "Beer Production by State",
+    subtitle = "Includes beer in bottles and cans, kegs and barrels, and beer kept on premesis",
+    caption = "Data: https://www.ttb.gov/beer/statistics",
+    x = NULL,
+    y = "Barrels"
+  )+
+  theme_ipsum()
+
+p3
+```
+
+```{r}
+#Load libraries
+library(tidyverse)
+library(scales)
+library(here)
+library(ggrepel)
+library(hrbrthemes)
+library(gcookbook)
+
+#Import the data
+beer_states <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-31/beer_states.csv')
+
+#Save it to my computer
+beer_states %>% write_csv(here::here("2020-03-31-beer/data", "beer_states_tidy.csv"))
+
+#Import data to R
+beer_states <- read_csv(here::here("2020-03-31-beer/data/beer_states_tidy.csv"))
+
+#Convert years to date format
+beer_states$year <- as.Date(paste(beer_states$year, 1, 1), '%Y %m %d')
+
+#Remove the rows containing yearly totals, leaving only state data.
+beer_states_no_totals <- beer_states %>%
+  #select(state, barrels)
+  filter(beer_states$state != "total")
+
+#Calculate total production for each state by year, summing on premesis, in bottles and cans, and kegs and barrels. 
+total_production_by_year <- beer_states_no_totals %>%
+  group_by(state, year) %>%
+  summarize(total = sum(barrels))
+
+#Let's highlight only the top five producers in 2019. 
+#Subset the data to only include 2019
+total_2019 <-  subset(total_production_by_year, total_production_by_year$year == "2019-01-01")
+#take the top 5
+top2019 <- head(arrange(total_2019, desc(total)), n = 5)
+#store that in a variable
+interested <- top2019$state
+
+p0 <- ggplot(total_production_by_year, aes(x = year, y = total))
+
+#Draw the states we are not interested in, color them gray
+p1 <- p0 + geom_line(data = subset(total_production_by_year, !(state %in% interested)),
+                     aes(group = state),
+                     alpha = 0.50,
+                     color = "gray")
+
+#Draw the states we are interested in. Ultimately labeling them got a bit messy. 
+p2 <- p1 + 
+  geom_line(data = subset(total_production_by_year, state %in% interested),aes(group=state, color = state))+
+  scale_color_brewer(palette = "Dark2")
+  #geom_text_repel(data = subset(total_production_by_year, state %in% interested & year == "2019-01-01"),aes(label = state), size = 3)
+  
+#Format the scales, labels
+p3 <- p2 +
+  scale_y_continuous(
+    labels = scales::label_comma()
+  ) +
+  scale_x_date(date_labels = "%Y")+
+  labs(
+    title = "Beer Production by State",
+    subtitle = "Includes beer in bottles and cans, kegs and barrels, and beer kept on premesis",
+    caption = "Data: https://www.ttb.gov/beer/statistics",
+    x = NULL,
+    y = "Barrels"
+  )+
+  theme_ipsum()
+
+p3
+
+#Save the chart
+ggsave(here::here("2020-03-31-beer/figs", "beer_states.png"), plot = p3, height = 8, width = 10)
+```
+
+
+
+
