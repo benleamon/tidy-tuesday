@@ -101,7 +101,7 @@ textarea {
     height: auto;
     max-height: 100vh;
     justify-self: center;
-    border: 1px solid gray;
+    /* border: 1px solid gray; */
   }
 
 
