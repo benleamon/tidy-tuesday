@@ -1,0 +1,85 @@
+---
+title: "cocktails_process"
+author: "Ben Leamon"
+date: "06/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Libraries
+library(tidyverse)
+library(scales)
+library(hrbrthemes)
+library(gcookbook)
+library(here)
+```
+
+```{r}
+#Get Data
+boston_cocktails <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-26/boston_cocktails.csv')
+```
+
+```{r}
+boston <- boston_cocktails
+
+recipe_num <- n_distinct(boston$name)
+
+#Get the top 20 ingredients
+top_twenty <- boston %>% 
+  count(ingredient, sort = TRUE) %>%
+  head(20) %>%
+  mutate(ingredient = fct_reorder(ingredient, n)) 
+ggplot(top_twenty,aes(n/recipe_num, ingredient))+
+  geom_point()+
+  scale_x_continuous(labels = percent_format())+
+  labs(
+    title = "Twenty Most Common Ingredients in Mr. Boston Recipes",
+    x = "Percent of all recipes"
+  )+
+  theme_ipsum()+
+  theme(
+    axis.title.y = element_blank(),
+    plot.title = element_text(family = "Fira Mono"),
+    strip.text = element_text(family = "Fira Mono"),
+    axis.text = element_text(family = "Fira Mono")
+  )
+
+```
+
+```{r}
+boston2 <- boston_cocktails %>%
+  #filter(category %in% c("Gin", "Cocktail Classics"))%>%
+  group_by(category) %>%
+  count(ingredient, sort = TRUE)%>%
+  #filter(n > 1) %>%
+  top_n(10, n)%>%
+  ungroup()%>%
+  arrange(category, n) %>%
+  mutate(row_order = row_number())
+
+ggplot(boston2, aes(n,row_order,na.rm=TRUE))+
+  geom_point()+
+  facet_wrap(~category, scales = "free", ncol = 2)+
+  scale_y_continuous(
+    breaks = boston$row_order,
+    labels = boston$ingredient
+  ) + 
+  scale_x_continuous() + 
+  labs(
+    title= "Ten most common ingredients by category"
+  ) + 
+  theme_ipsum() + 
+  theme(
+    axis.title.y = element_blank(),
+    plot.title = element_text(family = "Fira Mono"),
+    strip.text = element_text(family = "Fira Mono"),
+    axis.text = element_text(family = "Fira Mono")
+  ) +
+  ggsave(here::here("cocktails", "cocktails.png"))
+
+```
+
