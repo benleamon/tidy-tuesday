@@ -24,6 +24,7 @@ boston_cocktails <- readr::read_csv('https://raw.githubusercontent.com/rfordatas
 ```
 
 ```{r}
+#Top twenty
 boston <- boston_cocktails
 
 recipe_num <- n_distinct(boston$name)
@@ -38,7 +39,8 @@ ggplot(top_twenty,aes(n/recipe_num, ingredient))+
   scale_x_continuous(labels = percent_format())+
   labs(
     title = "Twenty Most Common Ingredients in Mr. Boston Recipes",
-    x = "Percent of all recipes"
+    x = "Percent of all recipes",
+    caption = "Source: Kaggle"
   )+
   theme_ipsum()+
   theme(
@@ -46,16 +48,17 @@ ggplot(top_twenty,aes(n/recipe_num, ingredient))+
     plot.title = element_text(family = "Fira Mono"),
     strip.text = element_text(family = "Fira Mono"),
     axis.text = element_text(family = "Fira Mono")
-  )
-
+  )+
+  ggsave(here::here("cocktails", "top-twenty.png"), dpi = 320, width = 11, height = 8)
 ```
 
 ```{r}
+#Cocktails by category
 boston2 <- boston_cocktails %>%
   #filter(category %in% c("Gin", "Cocktail Classics"))%>%
   group_by(category) %>%
   count(ingredient, sort = TRUE)%>%
-  #filter(n > 1) %>%
+  filter(n > 1) %>%
   top_n(10, n)%>%
   ungroup()%>%
   arrange(category, n) %>%
@@ -63,23 +66,25 @@ boston2 <- boston_cocktails %>%
 
 ggplot(boston2, aes(n,row_order,na.rm=TRUE))+
   geom_point()+
-  facet_wrap(~category, scales = "free", ncol = 2)+
+  facet_wrap(~category, scales = "free", ncol = 1)+
   scale_y_continuous(
-    breaks = boston$row_order,
-    labels = boston$ingredient
+    breaks = boston2$row_order,
+    labels = boston2$ingredient
   ) + 
   scale_x_continuous() + 
   labs(
-    title= "Ten most common ingredients by category"
+    title= "Top Ten Ingredients by Category",
+    subtitle = "Includes ingredients that appear more than once",
+    caption = "Source: Kaggle"
   ) + 
   theme_ipsum() + 
   theme(
     axis.title.y = element_blank(),
-    plot.title = element_text(family = "Fira Mono"),
+    plot.title = element_text(family = "Fira Mono", hjust = 0),
     strip.text = element_text(family = "Fira Mono"),
     axis.text = element_text(family = "Fira Mono")
   ) +
-  ggsave(here::here("cocktails", "cocktails.png"))
+  ggsave(here::here("cocktails", "cocktails-by-category.png"), dpi = 320, width = 8, height = 22)
 
 ```
 
