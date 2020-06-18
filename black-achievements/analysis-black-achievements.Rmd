@@ -1,0 +1,112 @@
+---
+title: "analysis"
+author: "Ben Leamon"
+date: "14/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Tidy Tuesday African-American Achievements 2020-06-09
+Load libraries:
+```{r}
+library(tidyverse)
+```
+Import data: 
+```{r}
+firsts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-09/firsts.csv')
+```
+Let's try a stacked bar graph: 
+```{r}
+firsts %>%
+  ggplot(aes(year, fill = category))+
+  geom_bar()
+```
+This is kind of hard to read. I could try aggregating it by decade or something? 
+```{r}
+firsts_dec <- firsts %>%
+  mutate(decade = year - year %% 10)
+
+firsts_dec %>%
+  ggplot(aes(decade, fill = category))+
+  geom_bar()
+```
+This is for sure clearer. Still, I'm not sure I like the stacked bar graph as a way to look at this? I find myself following the overall like, it makes it look like people achieved less in 2010-2020 than they did in the 2000s. I also kind of want to highlight that each of these firsts is an individual. 
+
+I think I need to add some more info to whatever graph I do as well. A cursory look at this makes it seem like people achieved a lot in the 1960s, and it's been downhill ever since. 
+
+```{r}
+firsts%>%
+  ggplot(aes(year, category, color = category))+
+  geom_jitter(aes(alpha = 0.2))+
+  theme(
+    legend.position = "none",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
+
+Hmmm... I like this more I think. It emphasizes the individuals, and while it's not interactive, each point could have a popup on hover or something like that. On the other hand, it's much harder to see the shape of the data. Those spikes and dips in the previous graph are all hidden now. 
+
+Ok let's just try some random stuff: 
+
+```{r}
+firsts %>%
+  ggplot(aes(year, category, fill = category, color = category)) + 
+  geom_violin()+
+  #geom_jitter(aes(alpha = 0.1, color = category))
+  theme(
+    legend.position = "none"
+  )
+```
+```{r}
+firsts %>% 
+  ggplot(aes(year))+
+  geom_histogram(binwidth = 2)
+```
+
+```{r}
+firsts %>% 
+  ggplot(aes(year, color = category))+
+  geom_freqpoly()
+```
+
+I think overall I like the dot graph the best for plotting achievements by category by year. 
+
+Let's try something different and get the gender breakdown/year. (Ok actually again it looks much better by decade.)
+```{r}
+firsts_dec %>%
+  ggplot(aes(decade, fill = gender))+
+  geom_bar(position = "dodge")
+```
+
+I think I'm gonna go back to the dot plot. 
+```{r fig.width=6, fig.asp=0.618}
+width <- 9
+
+theme_set(theme_minimal())
+theme <- theme_update(
+  text = element_text(family = "Fira Mono"),
+  plot.title = element_text(family = "Fira Sans Medium"),
+  plot.title.position = "plot",
+  legend.position = "none",
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  plot.caption = element_text(family = "Fira Mono"),
+  plot.margin = margin(20,20,20,20)
+  #plot.background = element_rect(fill = "#eceff4")
+)
+
+firsts%>%
+  ggplot(aes(year, category, color = category))+
+  geom_jitter()+
+  labs(
+    title = "African American Achievements",
+    caption = "Data: Wikipedia | Plot: Ben Leamon"
+  )+
+  paletteer::scale_color_paletteer_d("IslamicArt::istanbul3")+
+  ggsave(here::here("black-achievements/black-achievements.png"), device = "png", type = "cairo", width = width, height = width*0.618, dpi = 300)
+```
+
