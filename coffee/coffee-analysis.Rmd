@@ -1,0 +1,17 @@
+---
+title: "coffee-analysis"
+author: "Ben Leamon"
+date: "16/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Import libraries: 
+```{r}
+library(tidyverse)
+```
+
+ 
