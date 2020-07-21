@@ -14,4 +14,31 @@ Import libraries:
 library(tidyverse)
 ```
 
- 
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2020-07-07')
+```
+```{r}
+coffee_ratings <- tuesdata$coffee_ratings
+```
+
+```{r}
+ggplot(coffee_ratings, aes(country_of_origin, total_cup_points, color = species))+
+  geom_jitter()+
+  coord_flip()
+```
+
+```{r}
+averages <- coffee_ratings %>%
+  group_by(country_of_origin, species)%>%
+  summarise(
+    mean = mean(total_cup_points),
+    min = min(total_cup_points),
+    max = max(total_cup_points)
+    )
+
+  ggplot(averages, aes(country_of_origin, mean, color = species))+
+    #Let's get the spread in here
+    geom_point()+
+    coord_flip()
+```
+
