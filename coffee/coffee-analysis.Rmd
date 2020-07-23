@@ -37,8 +37,26 @@ averages <- coffee_ratings %>%
     )
 
   ggplot(averages, aes(country_of_origin, mean, color = species))+
-    #Let's get the spread in here
     geom_point()+
-    coord_flip()
+    #geom_point(aes(country_of_origin, max, color = species))+
+    coord_flip()+
+    theme_light()
 ```
+
+```{r}
+averages <- coffee_ratings %>%
+  group_by(country_of_origin)%>%
+  summarise(
+    mean = mean(total_cup_points),
+    min = min(total_cup_points),
+    max = max(total_cup_points)
+    )
+
+  ggplot(averages, aes(fct_reorder(country_of_origin,mean), mean))+
+    geom_point()+
+    #geom_point(aes(country_of_origin, max, color = species))+
+    coord_flip()+
+    theme_light()
+```
+
 
