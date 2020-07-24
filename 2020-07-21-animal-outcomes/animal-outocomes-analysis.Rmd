@@ -1,0 +1,76 @@
+---
+title: "animal-outcomes-analysis"
+author: "Ben Leamon"
+date: "23/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2020-07-21')
+```
+```{r}
+animal_complaints <- tuesdata$animal_complaints
+```
+
+Let's look at complaints first. What animals do we have? 
+```{r}
+animal_complaints %>%
+  count(`Animal Type`)
+```
+Lots more dogs than cats, what are the cats getting up to?
+```{r}
+animal_complaints %>%
+  filter(`Animal Type` == "cat") %>%
+  count(`Complaint Type`, sort = TRUE)
+```
+Hmm... Nothing too juicy.
+
+Let's see if Brisbane has got anything fun.
+```{r}
+brisbane <- tuesdata$brisbane_complaints
+brisbane %>%
+  count(animal_type, sort = TRUE)
+```
+Let's have a look at what the "Other animal" categories are. 
+```{r}
+brisbane%>%
+  filter(animal_type == "Other Animal") %>%
+  count(category, sort = TRUE)
+```
+Ok well it doesn't seem like there's a place where we can conlcusively see what the animals in the complaint are. Most are foxes, nuisances, or deer though. Not going to lie, I was kind of hoping for some weird dagerous animals. 
+
+Let's go to the general outcomes sheet. This is probably the one I'll end up looking at.
+
+```{r}
+outcomes <- tuesdata$animal_outcomes
+```
+
+What animals are most common
+```{r}
+outcomes %>%
+  count(animal_type, sort = TRUE)
+```
+Oh, duh, these are yearly totals. 
+
+```{r}
+outcomes %>%
+  group_by(year, animal_type) %>%
+  ggplot(aes(year, Total, fill = animal_type))+
+  geom_bar(stat = "identity", position = "dodge")
+```
+
+```{r}
+outcomes %>%
+  
+```
+
+
+
