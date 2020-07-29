@@ -67,10 +67,40 @@ outcomes %>%
   geom_bar(stat = "identity", position = "dodge")
 ```
 
+Let's look at the total number of animals that the RSPCA deals with in a given year. 
 ```{r}
-outcomes %>%
-  
+totals <- outcomes %>%
+  group_by(year, animal_type) %>%
+  summarise(species_total = sum(Total))
+
+grand_total <- totals %>%
+  filter( is.na(species_total) == FALSE)%>%
+  group_by(year)%>%
+  summarise(grand_total = sum(species_total))
 ```
 
+```{r}
+ggplot(grand_total, aes(year, grand_total))+
+  geom_line()+
+  expand_limits(y =0)
+```
+Total numbers fell a lot after 2010.
 
+Total number of animals who interact with the system by species by year:
+```{r}
+totals %>%
+  ggplot(aes(year, species_total, color = animal_type))+
+  geom_line()
+```
+Dogs and cats both had really high numbers around 2008. I wonder if that had to do iwth the financial crisis?
 
+What happens to each of these species? 
+```{r}
+outcomes%>% 
+  group_by(year, animal_type) %>%
+  ggplot(aes(year, Total, color = outcome))+
+  geom_line()+
+  facet_wrap(~animal_type, scales = "free_y")
+  
+```
+OK this is looking a bit promising, not sure I like the free scales though. I think I need to change this into a proportion. 
