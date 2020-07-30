@@ -103,4 +103,4 @@ outcomes%>%
   facet_wrap(~animal_type, scales = "free_y")
   
 ```
-OK this is looking a bit promising, not sure I like the free scales though. I think I need to change this into a proportion. 
+OK this is looking a bit promising, not sure I like the free scales though. I think I need to change this into a proportion.  
