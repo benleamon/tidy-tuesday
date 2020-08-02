@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(RColorBrewer)
 ```
 
 ```{r}
@@ -112,11 +113,36 @@ prop <- outcomes %>%
 
  outcomes_prop<- inner_join(outcomes, outcomes_prop) %>%
    mutate(prop = Total / species_total)
- 
+```
+```{r}
+width <- 9
+
+theme_set(theme_minimal())
+theme <- theme_update(
+  text = element_text(family = "Fira Mono"),
+  plot.title = element_text(family = "Fira Sans Medium"),
+  plot.title.position = "plot",
+  legend.title = element_blank(),
+  legend.position = "bottom",
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  plot.caption = element_text(family = "Fira Mono"),
+  plot.margin = margin(20,20,20,20)
+  #plot.background = element_rect(fill = "#eceff4")
+)
+
 outcomes_prop %>%
   group_by(year, animal_type)%>%
   ggplot(aes(year, prop, color = outcome))+
   geom_line()+
-  facet_wrap(~animal_type)
+  scale_y_continuous(label = scales::percent)+
+  scale_color_brewer(palette = "Dark2")+
+  facet_wrap(~animal_type) + 
+  labs(
+    title = "What happens to animals in RSPCA shelters, care and adoption centers?",
+    subtitle = "Animal outcomes by species",
+    caption = "Data: RSPCA | Plot: Ben Leamon"
+  )+
+  ggsave(here::here("2020-07-21-animal-outcomes/outcomes.png"), device = "png", type = "cairo", width = width, height = width*0.618, dpi = 300)
 ```
-I think this is probalbly where I'll leave it. 
+
