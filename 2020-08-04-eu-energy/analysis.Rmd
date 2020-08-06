@@ -28,3 +28,16 @@ OK so based on a quick glance, possible options could be:
 https://cran.r-project.org/web/packages/mekko/vignettes/mekko-vignette.html
 https://stackoverflow.com/questions/19233365/how-to-create-a-marimekko-mosaic-plot-in-ggplot2 
 https://dqn.website/post/interactive-mekko-charts-in-r/
+
+```{r}
+totals <- energy_types %>%
+  group_by(country) %>%
+  summarise(calc_total = sum(`2018`))
+```
+OK so just summing all of them does in fact equal total net production in the energy_totals df.
+
+Get the data ready for the marimekko chart:
+```{r}
+#
+```
+
