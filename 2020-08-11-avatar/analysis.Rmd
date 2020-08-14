@@ -1,0 +1,36 @@
+---
+title: "analysis"
+author: "Ben Leamon"
+date: "15/08/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2020-08-11')
+```
+
+```{r}
+avatar <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-11/avatar.csv')
+scene_description <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-11/scene_description.csv')
+
+```
+
+# Possible things to look at: 
+- What charactars are in what epiodes? 
+- charactar words/episode
+- episode rankings
+- look at episode rankings as well as book rankings
+- number of authors/ep ranking by author 
+- same for director
+- does writer or director matter more? 
+- most common words/ character 
+- most common words/character (non-main charctar)

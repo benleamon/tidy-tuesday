@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Libraries:
 ```{r}
 library(tidyverse)
+library(mekko)
 ```
 
 # Import data
@@ -38,6 +39,15 @@ OK so just summing all of them does in fact equal total net production in the en
 
 Get the data ready for the marimekko chart:
 ```{r}
-#
+types <- energy_types 
+data <- types %>%
+  #Create a renewable vs non renewable category
+  #group by country, category
+  group_by(country)%>%
+  #sum based on 2018
+  summarise()
+
+#types %>%
+#  barmekko(types, country, )
 ```
 
