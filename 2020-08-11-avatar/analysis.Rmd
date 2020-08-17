@@ -23,6 +23,13 @@ avatar <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tid
 scene_description <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-11/scene_description.csv')
 
 ```
+# Strip out the theme song words.
+```{r}
+
+```
+
+
+# Get number of words/sentance
 
 # Possible things to look at: 
 - What charactars are in what epiodes? 
@@ -34,3 +41,5 @@ scene_description <- readr::read_csv('https://raw.githubusercontent.com/rfordata
 - does writer or director matter more? 
 - most common words/ character 
 - most common words/character (non-main charctar)
+
+
