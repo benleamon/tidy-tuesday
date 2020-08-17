@@ -1,5 +1,5 @@
 ---
-title: "analysis"
+title: "Avatar"
 author: "Ben Leamon"
 date: "15/08/2020"
 output: html_document
@@ -23,13 +23,32 @@ avatar <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tid
 scene_description <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-11/scene_description.csv')
 
 ```
+
 # Strip out the theme song words.
 ```{r}
+distinct_lines <- avatar%>% distinct(full_text)
+theme_song = distinct_lines$full_text[1]
+
+theme_song <- "Water. Earth. Fire. Air. Long ago, the four nations lived together in harmony. Then, everything changed when the Fire Nation attacked. Only the Avatar, master of all four elements, could stop them, but when the world needed him most, he vanished. A hundred years passed, and my brother and I discovered the new Avatar, an airbender named Aang. And although his airbending skills are great, he has a lot to learn before he's ready to save anyone. But I believe Aang can save the world."
+first_theme <- "Water. Earth. Fire. Air. My grandmother used to tell me stories about the old days: a time of peace when the Avatar kept balance between the Water Tribes, Earth Kingdom, Fire Nation and Air Nomads. But that all changed when the Fire Nation attacked. Only the Avatar mastered all four elements; only he could stop the ruthless firebenders. But when the world needed him most, he vanished. A hundred years have passed, and the Fire Nation is nearing victory in the war. Two years ago, my father and the men of my tribe journeyed to the Earth Kingdom to help fight against the Fire Nation, leaving me and my brother to look after our tribe. Some people believe that the Avatar was never reborn into the Air Nomads and that the cycle is broken, but I haven't lost hope. I still believe that, somehow, the Avatar will return to save the world."
+themes <- c(theme_song, first_theme)
+
+dialogue <- avatar %>%
+  filter(!(full_text %in% themes))
 
 ```
 
-
 # Get number of words/sentance
+```{r}
+a_word <- "([^ ]+)"
+no_dots <- " \\.\\.\\."
+no_dashes <- " \\-\\-"
+
+
+
+dialogue <- dialogue %>%
+  mutate(word_number = str_count(character_words, a_word) - str_count(character_words, no_dots) - str_count(character_words, no_dashes))
+```
 
 # Possible things to look at: 
 - What charactars are in what epiodes? 
