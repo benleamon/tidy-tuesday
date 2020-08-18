@@ -50,10 +50,29 @@ dialogue <- dialogue %>%
   mutate(word_number = str_count(character_words, a_word) - str_count(character_words, no_dots) - str_count(character_words, no_dashes))
 ```
 
+# Add a season-episode id: 
+```{r}
+dialogue <- dialogue %>%
+  unite(season_ep, book_num, chapter_num, sep = ".", remove = FALSE) %>%
+  mutate(
+    #season_ep = as.double(season_ep)
+  )
+```
+
 # Possible things to look at: 
 - What charactars are in what epiodes? 
 - charactar words/episode
+
 - episode rankings
+```{r}
+dialogue %>%
+  distinct(book,book_num, chapter_num, chapter, imdb_rating) %>%
+  ggplot(aes(chapter_num, imdb_rating, color = book)) + 
+  geom_point()+
+  facet_wrap(~book_num)
+  
+```
+
 - look at episode rankings as well as book rankings
 - number of authors/ep ranking by author 
 - same for director
