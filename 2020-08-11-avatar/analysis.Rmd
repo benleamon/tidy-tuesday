@@ -60,10 +60,24 @@ dialogue <- dialogue %>%
 ```
 
 # Possible things to look at: 
-- What charactars are in what epiodes? 
+## What charactars are in what epiodes?
+```{r}
+characters <- dialogue %>%
+  group_by(chapter, season_ep) %>%
+  distinct(character)
+```
+
+## How many times does each character show up?
+```{r}
+# Now just to get the number of times a character shows up 
+top_characters <- characters %>%
+  group_by(character) %>%
+  count(character, sort = TRUE)
+```
+
 - charactar words/episode
 
-- episode rankings
+## Episode rankings over time
 ```{r}
 dialogue %>%
   distinct(book,book_num, chapter_num, chapter, imdb_rating) %>%
@@ -73,7 +87,6 @@ dialogue %>%
   
 ```
 
-- look at episode rankings as well as book rankings
 - number of authors/ep ranking by author 
 - same for director
 - does writer or director matter more? 
