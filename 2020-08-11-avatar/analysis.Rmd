@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(tidytext)
 ```
 
 ```{r}
@@ -75,8 +76,6 @@ top_characters <- characters %>%
   count(character, sort = TRUE)
 ```
 
-- charactar words/episode
-
 ## Episode rankings over time
 ```{r}
 dialogue %>%
@@ -87,10 +86,72 @@ dialogue %>%
   
 ```
 
-- number of authors/ep ranking by author 
-- same for director
-- does writer or director matter more? 
-- most common words/ character 
-- most common words/character (non-main charctar)
+## ep ranking by author
+Are there enough writers to make this interesting?
+```{r}
+dialogue %>%
+  count(writer, sort = TRUE)
+
+```
+Yes. 
+Does the writer have any relationship to IMDB rating
+```{r}
+dialogue %>%
+  ggplot(aes(imdb_rating, writer))+
+  geom_boxplot()
+```
+Hmm...
+
+## Relationship between director and scores? 
+How many directors? 
+```{r}
+dialogue %>%
+  distinct(chapter, director) %>%
+  count(director, sort = TRUE)
+```
+Director and IMDB
+```{r}
+dialogue %>%
+  distinct (chapter, director, imdb_rating) %>%
+  ggplot(aes(director, imdb_rating))+
+  geom_violin()
+```
+I wonder how much influence the director actually has on quality... 
+
+## does writer or director matter more? 
+
+## Tokenize the words
+```{r}
+data(stop_words)
+
+tidy_dialogue <- dialogue %>%
+  select(character, character_words, season_ep) %>%
+  mutate(id = row_number())%>%
+  unnest_tokens(word, character_words)
+
+tidy_dialogue <- tidy_dialogue %>%
+  anti_join(stop_words)
+
+tidy_dialogue
+```
+## What are the most common words in the series? 
+```{r}
+tidy_dialogue %>%
+  count(word, sort = TRUE)
+```
+## most common words/ character
+```{r}
+tidy_dialogue %>%
+  group_by(character) %>%
+  count(word) %>%
+  # Need to filter out the characters we don't care about, maybe using lump
+  # need to filter out the top words for each character, maybe the top 5 or 10.
+  ggplot(aes(n, word))+
+  geom_col()+
+  facet_wrap(~character)
+```
 
 
+##most common words/character (non-main charctar)
+
+##charactar words/episode
