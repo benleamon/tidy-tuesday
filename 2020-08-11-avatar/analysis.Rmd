@@ -141,14 +141,22 @@ tidy_dialogue %>%
 ```
 ## most common words/ character
 ```{r}
-tidy_dialogue %>%
+interested <- c("Aang", "Katara", "Toph", "Sokka", "Zuko", "Iroh")
+
+dialogue_ordered <- tidy_dialogue %>%
   group_by(character) %>%
+  #filter(character == "Aang") %>%
+  filter(character %in% interested) %>%
   count(word) %>%
-  # Need to filter out the characters we don't care about, maybe using lump
-  # need to filter out the top words for each character, maybe the top 5 or 10.
-  ggplot(aes(n, word))+
-  geom_col()+
-  facet_wrap(~character)
+  slice_max(order_by = n, n = 10) %>%
+  ungroup()%>%
+  mutate(character = as.factor(character),
+         word = reorder_within(word, n, character))
+  
+ggplot(dialogue_ordered, aes(n, word))+
+    geom_col()+
+    facet_wrap(~character, scales = "free")+
+    scale_y_reordered()
 ```
 
 
