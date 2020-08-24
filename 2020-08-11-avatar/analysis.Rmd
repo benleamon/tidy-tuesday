@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(tidytext)
+library(ggrepel)
 ```
 
 ```{r}
@@ -62,6 +63,15 @@ dialogue <- dialogue %>%
 
 # Possible things to look at: 
 ## How many times does each character show up?
+
+## What charactars are in what epiodes?
+```{r}
+characters <- dialogue %>%
+  group_by(book, book_num, chapter, season_ep, chapter_num) %>%
+  distinct(character)
+  
+```
+
 ```{r}
 # Now just to get the number of times a character shows up 
 top_characters <- characters %>%
@@ -69,14 +79,14 @@ top_characters <- characters %>%
   count(character, sort = TRUE)
 ```
 
-## What charactars are in what epiodes?
+
 ```{r}
 characters <- dialogue %>%
   group_by(book, book_num, chapter, season_ep, chapter_num) %>%
   distinct(character) %>%
   inner_join(top_characters, by = "character")
-  
 ```
+
 
 ```{r}
 interested_characters <- characters %>%
@@ -208,5 +218,113 @@ ggplot(ep_words, aes(chapter_num, n))+
 ggplot(ep_words, aes(n, imdb_rating))+
   geom_point()+
   geom_smooth()
+```
+
+# Moving to the final charts: 
+```{r}
+nations_palette <- c("#3a7714","#a20100","#004f97","#fa5e00")
+```
+## Episode rankings over time: 
+```{r}
+width <- 9
+
+ranking_dialogue <- dialogue%>%
+  distinct(book,book_num, chapter_num, chapter, imdb_rating)
+
+interested_eps <- ranking_dialogue %>%
+  group_by(book) %>%
+  slice_max( order_by = imdb_rating, n = 2)
+
+theme_set(theme_minimal())
+theme <- theme_update(
+  text = element_text(family = "Fira Mono"),
+  plot.title = element_text(family = "Fira Sans Medium"),
+  plot.title.position = "plot",
+  legend.position = "none",
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  plot.caption = element_text(family = "Fira Mono"),
+  plot.margin = margin(20,20,20,20)
+  #plot.background = element_rect(fill = "#eceff4")
+)
+
+book_names <- as_labeller(c(`1` = "Water", `2` = "Earth",`3` = "Fire"))
+  
+ggplot(ranking_dialogue, aes(chapter_num, imdb_rating, color = book)) + 
+  geom_point()+
+  #geom_line()+
+  scale_color_manual(values = nations_palette)+
+  expand_limits(y=10)+
+  facet_wrap(~book_num, labeller = book_names)+
+  geom_text_repel(data = subset(ranking_dialogue, chapter %in% interested_eps$chapter), 
+                  mapping = aes(label = chapter),
+                  box.padding = 1,
+                  size = 3,
+                  color = "black",
+                  direction = "y") +
+  labs(title = "Which episodes have the highest ratings?",
+       subtitle = "Top-rated episodes in each season",
+       caption = "Data: appa | Plot: Ben Leamon | Ratings from IMDB") #+ 
+  ggsave(here::here("2020-08-11-avatar/figs/rankings.png"),device = "png", type = "cairo", width = width, height = width*0.618, dpi = 300)
+  
+```
+
+## Words per episode
+```{r}
+
+
+ep_words <- tidy_dialogue %>%
+  add_count(chapter)%>%
+  distinct(chapter, .keep_all = TRUE) 
+  
+chatty <- ep_words %>% 
+  group_by(book) %>% 
+  slice_max(order_by = n, n = 2)
+
+quiet <- ep_words %>% 
+  group_by(book) %>% 
+  slice_min(order_by = n, n = 2)
+
+ggplot(ep_words, aes(chapter_num, n, color = book))+
+  geom_point() +
+  #geom_line()+
+  geom_text_repel(data = subset(ep_words, chapter %in% chatty$chapter | 
+                                  chapter %in% quiet$chapter), 
+                  aes(label = chapter),
+                  box.padding = 1,
+                  size = 3,
+                  color = "black") +
+  scale_color_manual(values = nations_palette)+
+  expand_limits(y = 1000)+
+  facet_wrap(~book_num, labeller = book_names)+
+  labs(title = "Which episodes have the most and least dialogue?",
+       subtitle = "Total words per episode",
+       caption = "Data: appa | Plot: Ben Leamon"
+  )+
+  ggsave(here::here("2020-08-11-avatar/figs/words.png"),device = "png", type = "cairo", width = width, height = width*0.618, dpi = 300)
+```
+
+## Most common words by character: 
+```{r}
+interested <- c("Aang", "Katara", "Toph", "Sokka", "Zuko", "Iroh")
+
+dialogue_ordered <- tidy_dialogue %>%
+  group_by(character) %>%
+  #filter(character == "Aang") %>%
+  filter(character %in% interested) %>%
+  count(word) %>%
+  slice_max(order_by = n, n = 10) %>%
+  ungroup()%>%
+  mutate(character = as.factor(character),
+         word = reorder_within(word, n, character))
+  
+ggplot(dialogue_ordered, aes(n, word))+
+    geom_col(fill = "#4D8FAC")+
+    #scale_fill_manual(values = nations_palette)+
+    facet_wrap(~character, scales = "free")+
+    scale_y_reordered()+
+    labs(title = "Most common words by character",
+       caption = "Data: appa | Plot: Ben Leamon")
+    ggsave(here::here("2020-08-11-avatar/figs/common_words.png"),device = "png", type = "cairo", width = width, height = width*0.618, dpi = 300)
 ```
 
