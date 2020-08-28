@@ -231,9 +231,13 @@ width <- 9
 ranking_dialogue <- dialogue%>%
   distinct(book,book_num, chapter_num, chapter, imdb_rating)
 
-interested_eps <- ranking_dialogue %>%
+highest_eps <- ranking_dialogue %>%
   group_by(book) %>%
   slice_max( order_by = imdb_rating, n = 2)
+
+lowest_eps <- ranking_dialogue %>%
+  group_by(book) %>%
+  slice_min(order_by = imdb_rating, n = 2)
 
 theme_set(theme_minimal())
 theme <- theme_update(
@@ -256,7 +260,7 @@ ggplot(ranking_dialogue, aes(chapter_num, imdb_rating, color = book)) +
   scale_color_manual(values = nations_palette)+
   expand_limits(y=10)+
   facet_wrap(~book_num, labeller = book_names)+
-  geom_text_repel(data = subset(ranking_dialogue, chapter %in% interested_eps$chapter), 
+  geom_text_repel(data = subset(ranking_dialogue, chapter %in% highest_eps$chapter | chapter %in% lowest_eps$chapter), 
                   mapping = aes(label = chapter),
                   box.padding = 1,
                   size = 3,
@@ -323,8 +327,8 @@ ggplot(dialogue_ordered, aes(n, word))+
     #scale_fill_manual(values = nations_palette)+
     facet_wrap(~character, scales = "free")+
     scale_y_reordered()+
-    labs(title = "Most common words by character",
-       caption = "Data: appa | Plot: Ben Leamon")
+    labs(title = "Most common words spoken by each character",
+       caption = "Data: appa | Plot: Ben Leamon")+
     ggsave(here::here("2020-08-11-avatar/figs/common_words.png"),device = "png", type = "cairo", width = width, height = width*0.618, dpi = 300)
 ```
 
