@@ -24,7 +24,7 @@ for (i in figs) {
                     paste0("![",clean_name," graph ",i,"](",name_date,"/figs/",i,")"))
 }
 ## Link to code at end of figs 
-readme_lines <- c(readme_lines, paste0("Code can be found [here](", name_date,")."))
+readme_lines <- c(readme_lines, paste0("Code can be found [here](", name_date,"). Click for full-size images."))
 
 # Read the current readme file
 readme <- readLines("README.md")
