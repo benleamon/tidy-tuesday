@@ -21,7 +21,7 @@ readme_lines <- paste0("\n", "## ",project_name," ", clean_name)
 ## Links to figs
 for (i in figs) {
   readme_lines <- c(readme_lines, 
-                    paste0("![",clean_name," graph ",i,"](",name_date,"/figs/",figs[i],")"))
+                    paste0("![",clean_name," graph ",i,"](",name_date,"/figs/",i,")"))
 }
 ## Link to code at end of figs 
 readme_lines <- c(readme_lines, paste0("Code can be found [here](", name_date,")."))
