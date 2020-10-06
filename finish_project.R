@@ -17,7 +17,7 @@ figs <- list.files(path = figs_folder)
 
 # Create string to add to readme.md
 ## Title
-readme_lines <- paste0("\n", "## ",project_name," ", clean_name)
+readme_lines <- paste0("\n", "## ",project_date," ", clean_name)
 ## Links to figs
 for (i in figs) {
   readme_lines <- c(readme_lines, 
