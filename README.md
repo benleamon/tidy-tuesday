@@ -1,4 +1,5 @@
-# tidy-tuesday
-My attempts to practice using R (and maybe other tools) in service of Tidy Tuesday challenges
-## Previous Tidy Tuesday Submissions: 
+# Tidy Tuesday
+Submissions and code for Tidy Tuesday challanges
+
+## Avatar: 
 ![alt](2020-08-11-avatar/figs/rankings.png)
