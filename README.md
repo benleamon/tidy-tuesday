@@ -17,7 +17,7 @@ Submissions and code for Tidy Tuesday challanges
 ![top ingredients by category](cocktails/cocktails-by-category.png)
 
 ## Tour de France
-![tour de france distance](2020-04-07-tour/figs/distance-by-year.png)
+![tour de france distance](2020-04-07-tour/figs/distance_by_year.png)
 
 ## Beer Production
-![tour de france distance](2020-03-31-beer/figs/beer-states.png)
+![tour de france distance](2020-03-31-beer/figs/beer_states.png)
