@@ -1,0 +1,50 @@
+---
+title: "2020-09-29-beyonce-lyrics-analysis"
+author: "Ben Leamon"
+date: "2020-10-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2020-09-29 Tidy Tuesday: Beyonce Lyrics
+```{r}
+tuesdata <- tidytuesdayR::tt_load("2020-09-29")
+bey_lyrics <- tuesdata$beyonce_lyrics
+```
+
+```{r}
+library(tidyverse)
+library(tidytext)
+```
+
+```{r}
+data(stop_words)
+
+tidy_lyrics <- bey_lyrics %>%
+  unnest_tokens(word, line) %>%
+  anti_join(stop_words)
+
+tidy_lyrics
+```
+```{r}
+dist_words <- distinct(tidy_lyrics, word)
+
+custom_stop_words <- bind_rows(tibble(word = c("ooh", "oooh", "wwith", "til", "i've", "i'm", "ahh", "wooooooo", "wooooo", "woooooo", "ooooohh", "ohhhoooooooooooooooooooooowww", "aww", "uh", "ooh", "da"), lexicon = c("custom")), stop_words)
+
+tidy_lyrics <- tidy_lyrics %>%
+  anti_join(custom_stop_words)
+
+```
+Popular words
+```{r}
+tidy_lyrics %>%
+  count(word, sort = TRUE) %>%
+  slice_max(order_by = n, n = 30) %>%
+  mutate(word = fct_reorder(word, n))%>%
+  ggplot(aes(n , word))+
+  geom_col()
+```
+
