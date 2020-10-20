@@ -45,7 +45,11 @@ tidy_lyrics %>%
   slice_max(order_by = n, n = 30) %>%
   mutate(word = fct_reorder(word, n))%>%
   ggplot(aes(n , word))+
-  geom_col()
+  geom_col()+
+  labs(
+    title = "What words are most common in Beyoncé songs?",
+    caption = "Data: Tidy Tuesday | Plot: Ben Leamon"
+  )
 ```
 
 Positive and negative words
