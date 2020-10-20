@@ -40,6 +40,21 @@ tidy_lyrics <- tidy_lyrics %>%
 ```
 Popular words
 ```{r}
+width <- 9
+
+theme_set(theme_minimal())
+theme <- theme_update(
+  text = element_text(family = "Fira Mono"),
+  plot.title = element_text(family = "Fira Sans Medium"),
+  plot.title.position = "plot",
+  legend.position = "none",
+  #axis.title.x = element_blank(),
+  #axis.title.y = element_blank(),
+  plot.caption = element_text(family = "Fira Mono"),
+  plot.margin = margin(20,20,20,20)
+  #plot.background = element_rect(fill = "#eceff4")
+)
+
 tidy_lyrics %>%
   count(word, sort = TRUE) %>%
   slice_max(order_by = n, n = 30) %>%
@@ -48,7 +63,9 @@ tidy_lyrics %>%
   geom_col()+
   labs(
     title = "What words are most common in Beyoncé songs?",
-    caption = "Data: Tidy Tuesday | Plot: Ben Leamon"
+    caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
+    x = "n",
+    y = "Word"
   )
 ```
 
@@ -65,7 +82,13 @@ tidy_lyrics %>%
   geom_col() + 
   facet_wrap(~sentiment, ncol = 2, scales = "free") + 
   coord_flip()+ 
-  scale_x_reordered()
+  scale_x_reordered()+
+  labs(
+    title = "Most common positive and negative words in Beyoncé lyrics",
+    caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
+    x = "n",
+    y = "Word"
+  )
 
 ```
 
@@ -77,28 +100,15 @@ lyrics_nrc <- tidy_lyrics %>%
 lyrics_nrc %>%
   count(sentiment, sort = TRUE) %>%
   ggplot(aes(sentiment, n)) + 
-  geom_col()
+  geom_col()+
+  labs(
+    title = "What sentiments are most common in Beyoncé lyrics?",
+    caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
+    x = NULL,
+    y = "n"
+  )
   
 ```
-
-
-OK, let's try and do this the same way the swift blogger did it, and see if the "scores" from the other package match up. They calculate some sort of valence, which I don't fully understand. Need to look into . 
-```{r}
-library(syuzhet)
-lyrics <- as.character(tidy_lyrics)
-lyrics_sentiment <- get_nrc_sentiment((lyrics))
-```
-
-```{r}
-sentimentscores <- data.frame(colSums(lyrics_sentiment[,]))   
-names(sentimentscores) <- "Score"
-sentimentscores <- cbind("sentiment" = rownames(sentimentscores), sentimentscores)
-
-  ggplot(sentimentscores, aes(sentiment, Score)) +
-  geom_bar(aes(fill = sentiment), stat = "identity", show.legend = FALSE) +
-  labs(x = "Emotion & sentiment", y = "Scores", title = "Emotion in Taylor Swift songs")
-```
-This code was coppied, but I think I'm not going to use it. The syuzhet package calculates valences, to generate the score, and I'm not sure how they do that. Something to look into, but also not something I could easily find info on. 
 
 What words are contributing to each sentiment? 
 ```{r}
@@ -112,7 +122,13 @@ lyrics_nrc %>%
   geom_col()+
   facet_wrap(~sentiment, ncol = 4, scales = "free")+
   coord_flip()+
-  scale_x_reordered()
+  scale_x_reordered()+
+  labs(
+    title = "Most common words for each sentiment:",
+    caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
+    x = "n",
+    y = "Word"
+  )
 ```
 
 Now let's look at which songs are most closely associated with which sentiments. 
