@@ -41,16 +41,18 @@ tidy_lyrics <- tidy_lyrics %>%
 Popular words
 ```{r}
 width <- 9
+title_font <- "Fira Sans Medium"
+main_font <- "Fira Mono"
 
 theme_set(theme_minimal())
 theme <- theme_update(
-  text = element_text(family = "Fira Mono"),
-  plot.title = element_text(family = "Fira Sans Medium"),
+  text = element_text(family = main_font),
+  plot.title = element_text(family = title_font),
   plot.title.position = "plot",
   legend.position = "none",
   #axis.title.x = element_blank(),
   #axis.title.y = element_blank(),
-  plot.caption = element_text(family = "Fira Mono"),
+  plot.caption = element_text(family = main_font),
   plot.margin = margin(20,20,20,20)
   #plot.background = element_rect(fill = "#eceff4")
 )
