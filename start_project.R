@@ -88,7 +88,13 @@ script_text <- paste0(
   ' Tidy Tuesday: ',
   clean_name,
   '\n',
-  download_code
+  download_code,
+  '\n',
+  'proj_path <- "', 
+  project_date,
+  '-',
+  project_name,
+  '"'
   # This is where to add any more code we want in the new script.
 )
 write(as.character(script_text), file(script_file))

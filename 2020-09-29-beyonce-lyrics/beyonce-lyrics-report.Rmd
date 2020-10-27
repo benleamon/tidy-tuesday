@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # 2020-09-29 Tidy Tuesday: Beyonce Lyrics
+I've been learning about text analysis using Tidy Text Mining with R (https://www.tidytextmining.com/), and thought I'd apply what I've learned so far to Beyoncé's song lyrics. If you'd like to check out the code for this project, you can find it all on my github(https://github.com/benleamon/tidy-tuesday/tree/master/2020-09-29-beyonce-lyrics).
 ```{r}
 tuesdata <- tidytuesdayR::tt_load("2020-09-29")
 bey_lyrics <- tuesdata$beyonce_lyrics
@@ -29,6 +30,8 @@ tidy_lyrics <- bey_lyrics %>%
 
 tidy_lyrics
 ```
+The first step was creating a list of stop-words- words that I don't want to use in my analysis. Since I'm looking at song lyrics, there are a lot of non-standard or otherwise meaningless words that I want to remove. I may have missed some, but in the end I purged: "ooh", "oooh", "wwith", "til", "i've", "i'm", "ahh", "wooooooo", "wooooo", "woooooo", "ooooohh", "aww", "uh", "ooh", "da", "woo", "halo", "woah", "whoa", "ohh", and the exceedingly long , "ohhhoooooooooooooooooooooowww".
+
 ```{r}
 dist_words <- distinct(tidy_lyrics, word)
 
@@ -38,26 +41,28 @@ tidy_lyrics <- tidy_lyrics %>%
   anti_join(custom_stop_words)
 
 ```
-Popular words
+Next I wanted to look at what words were used most frequently in Beyoncé's songs. 
 ```{r}
-width <- 9
+width <- 10
 title_font <- "Fira Sans Medium"
 main_font <- "Fira Mono"
 
 theme_set(theme_minimal())
 theme <- theme_update(
   text = element_text(family = main_font),
-  plot.title = element_text(family = title_font),
+  plot.title = element_text(family = title_font, size = 14),
   plot.title.position = "plot",
   legend.position = "none",
+  axis.title = element_text(size = 10),
+  axis.text = element_text(size = 10),
   #axis.title.x = element_blank(),
   #axis.title.y = element_blank(),
-  plot.caption = element_text(family = main_font),
+  plot.caption = element_text(family = main_font, size = 8),
   plot.margin = margin(20,20,20,20)
   #plot.background = element_rect(fill = "#eceff4")
 )
 
-tidy_lyrics %>%
+p <- tidy_lyrics %>%
   count(word, sort = TRUE) %>%
   slice_max(order_by = n, n = 30) %>%
   mutate(word = fct_reorder(word, n))%>%
@@ -68,10 +73,14 @@ tidy_lyrics %>%
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
     x = "n",
     y = "Word"
-  )
-```
+  ) 
 
-Positive and negative words
+ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/common_words.png"), plot = p, device = "png", type = "cairo", width = 6, height = 6,units = "in", dpi = 300)
+
+p
+```
+I don't listen Beyoncé too frequently, but none of this seems that surprising. Next I wanted to see what were the most frequent postive and negative words in her songs. 
+
 ```{r}
 tidy_lyrics %>%
   inner_join(get_sentiments("bing")) %>%
@@ -90,9 +99,11 @@ tidy_lyrics %>%
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
     x = "n",
     y = "Word"
-  )
+  ) +
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/postive_v_negative.png"), device = "png", type = "cairo", width = 6, height = 6,units = "in", dpi = 300)
 
 ```
+She uses love *a lot*; it's by far the most common positive word in her songs. Some of the negative words seem a bit suspect however. Lots of them seem negative on their own, but can take on different meanings when used in conjunction with other words. If crazy was used, for example, in the context of "crazy in love", there's nothing negative about it. "Bad" and "damn" have similarly ambiguous uses. We'll come back to this momentarily. First, let's do a little more analysis based on single words. 
 
 What emotions are most common in Beyonce songs? 
 ```{r}
@@ -108,10 +119,11 @@ lyrics_nrc %>%
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
     x = NULL,
     y = "n"
-  )
+  )+
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/common_sentiments.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
   
 ```
-
+We can see that there's lots of positivity, negativity, and joy in a lot of Beyoncé's songs, which to a novice like me isn't that surprising. Some of the bases for these sentiments seems more solid than others however. 
 What words are contributing to each sentiment? 
 ```{r}
 lyrics_nrc %>%
@@ -130,8 +142,10 @@ lyrics_nrc %>%
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
     x = "n",
     y = "Word"
-  )
+  )+
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/words_by_sentiment.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
+While some of the words contributing to each sentiment make sense, positive, joy, and trust for example, especially in the context of song lyrics some seem more shaky. Alternate meanings for "slay" come to mind. Is she talking about murdering people, or using it to connote excellence? 
 
 Now let's look at which songs are most closely associated with which sentiments. 
 ```{r}
@@ -143,13 +157,13 @@ lyrics_nrc %>%
   mutate(song_name = reorder_within(song_name, n, sentiment)) %>%
   ggplot(aes(song_name, n)) +
   geom_col()+
-  facet_wrap(~sentiment, ncol =2, scales = "free")+
+  facet_wrap(~sentiment, ncol =1, scales = "free")+
   coord_flip()+
-  scale_x_reordered()
+  scale_x_reordered()+
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/sentiment_by_song.png"), device = "png", type = "cairo", width = width, height = (width*0.618)*2,units = "in", dpi = 300)
 ```
 Lemonade Film (Script) seems to be coming in at the top of many of the negative emotions. 
 
-Let's do a little n-gram analysis. 
 
 ```{r}
 bey_bigrams <- bey_lyrics %>%
@@ -208,7 +222,8 @@ negated_bigrams %>%
   geom_col(show.legend = FALSE)+
   coord_flip()+
   facet_wrap(~word1, scales = "free")+
-  scale_x_reordered()
+  scale_x_reordered()+
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/negated_bigrams.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
 Note: the blue words make the songs seem eroniously positive, and the red words make it seem eroniously negative. In short, her songs are a lot less positive than they seem at first glance!
 
@@ -238,8 +253,9 @@ a <- grid::arrow(type = "closed", length = unit(.1, "inches"))
 ggraph(bigram_graph, layout = "fr") +
   geom_edge_link(aes(edge_alpha = n), arrow = a, show.legend = FALSE)+
   geom_node_point(color = "cornflowerblue")+
-  geom_node_text(aes(label = name), vjust = 1.5, hjust = 1.5)+
-  theme_void()
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1)+
+  theme_void()+
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/bigram_connections.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
 Interesting. Lots of words are bigrams with themselves, for example "run", "whoa", "ma", "waiting", and "wow". This makes sense, song lyrics have ltos of repeated words. The other thing that's interesting is that the bigrams aren't more connected. Again, I suppose this makes sense. Songs will have lots of often-repeated combinations of words, especially in the chourus.
 There are also some bigrams that show a relationship in both directions. I suspect that these are phases from the chorus that are repeated back to back. For example, the bigram "gettin" "bodied". In the song "Get Me Bodied", "Gettin' bodied" is repeated over and over. Because line breaks aren't taken into account when creating the bigrams, the both "gettin bodied" and "bodied gettin" appear. This is a weakness in the analysis, since combinations of words that often appear at the end and beginning of lines would be considered bigrams, despite a listener not necessarily considering them connected. 
