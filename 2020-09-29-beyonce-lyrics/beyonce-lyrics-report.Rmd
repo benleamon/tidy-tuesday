@@ -19,6 +19,7 @@ bey_lyrics <- tuesdata$beyonce_lyrics
 ```{r}
 library(tidyverse)
 library(tidytext)
+library(beyonce)
 ```
 
 ```{r}
@@ -67,7 +68,7 @@ p <- tidy_lyrics %>%
   slice_max(order_by = n, n = 30) %>%
   mutate(word = fct_reorder(word, n))%>%
   ggplot(aes(n , word))+
-  geom_col()+
+  geom_col(fill = beyonce_palette(129)[2])+
   labs(
     title = "What words are most common in Beyoncé songs?",
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
@@ -75,7 +76,7 @@ p <- tidy_lyrics %>%
     y = "Word"
   ) 
 
-ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/common_words.png"), plot = p, device = "png", type = "cairo", width = 6, height = 6,units = "in", dpi = 300)
+ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-1_common_words.png"), plot = p, device = "png", type = "cairo", width = 6, height = 6,units = "in", dpi = 300)
 
 p
 ```
@@ -89,18 +90,19 @@ tidy_lyrics %>%
   slice_max(order_by = n, n = 20) %>%
   ungroup() %>%
   mutate(word = reorder_within(word, n, sentiment)) %>%
-  ggplot(aes(word, n)) + 
+  ggplot(aes(word, n, fill = sentiment)) + 
   geom_col() + 
   facet_wrap(~sentiment, ncol = 2, scales = "free") + 
   coord_flip()+ 
   scale_x_reordered()+
+  scale_fill_manual(values = c(beyonce_palette(129)[6],beyonce_palette(129)[4]))+
   labs(
     title = "Most common positive and negative words in Beyoncé lyrics",
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
     x = "n",
     y = "Word"
   ) +
-  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/postive_v_negative.png"), device = "png", type = "cairo", width = 6, height = 6,units = "in", dpi = 300)
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-2_postive_v_negative.png"), device = "png", type = "cairo", width = 6, height = 6,units = "in", dpi = 300)
 
 ```
 She uses love *a lot*; it's by far the most common positive word in her songs. Some of the negative words seem a bit suspect however. Lots of them seem negative on their own, but can take on different meanings when used in conjunction with other words. If crazy was used, for example, in the context of "crazy in love", there's nothing negative about it. "Bad" and "damn" have similarly ambiguous uses. We'll come back to this momentarily. First, let's do a little more analysis based on single words. 
@@ -112,7 +114,7 @@ lyrics_nrc <- tidy_lyrics %>%
 
 lyrics_nrc %>%
   count(sentiment, sort = TRUE) %>%
-  ggplot(aes(sentiment, n)) + 
+  ggplot(aes(sentiment, n, fill = sentiment)) + 
   geom_col()+
   labs(
     title = "What sentiments are most common in Beyoncé lyrics?",
@@ -120,7 +122,8 @@ lyrics_nrc %>%
     x = NULL,
     y = "n"
   )+
-  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/common_sentiments.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
+  scale_fill_manual(values = beyonce_palette(82))+
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-3_common_sentiments.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
   
 ```
 We can see that there's lots of positivity, negativity, and joy in a lot of Beyoncé's songs, which to a novice like me isn't that surprising. Some of the bases for these sentiments seems more solid than others however. 
@@ -132,18 +135,18 @@ lyrics_nrc %>%
   slice_max(order_by = n, n = 5) %>%
   ungroup()%>%
   mutate(word = reorder_within(word,n,sentiment))%>%
-  ggplot(aes(word, n))+
-  geom_col()+
+  ggplot(aes(word, n, fill = sentiment))+
+  geom_col(fill = beyonce_palette(129)[4])+
   facet_wrap(~sentiment, ncol = 4, scales = "free")+
-  coord_flip()+
   scale_x_reordered()+
+  #scale_fill_manual(values = beyonce_palette(89))+
   labs(
     title = "Most common words for each sentiment:",
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
     x = "n",
     y = "Word"
   )+
-  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/words_by_sentiment.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-4_words_by_sentiment.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
 While some of the words contributing to each sentiment make sense, positive, joy, and trust for example, especially in the context of song lyrics some seem more shaky. Alternate meanings for "slay" come to mind. Is she talking about murdering people, or using it to connote excellence? 
 
@@ -156,11 +159,11 @@ lyrics_nrc %>%
   ungroup() %>%
   mutate(song_name = reorder_within(song_name, n, sentiment)) %>%
   ggplot(aes(song_name, n)) +
-  geom_col()+
+  geom_col(fill = beyonce_palette(129)[5])+
   facet_wrap(~sentiment, ncol =1, scales = "free")+
   coord_flip()+
   scale_x_reordered()+
-  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/sentiment_by_song.png"), device = "png", type = "cairo", width = width, height = (width*0.618)*2,units = "in", dpi = 300)
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-5_sentiment_by_song.png"), device = "png", type = "cairo", width = width, height = (width*0.618)*2,units = "in", dpi = 300)
 ```
 Lemonade Film (Script) seems to be coming in at the top of many of the negative emotions. 
 
@@ -223,14 +226,15 @@ negated_bigrams %>%
   coord_flip()+
   facet_wrap(~word1, scales = "free")+
   scale_x_reordered()+
+  scale_fill_manual(values = c(beyonce_palette(129)[6],beyonce_palette(129)[4]))+
   labs(
     title = "How are negated words influencing sentiment scores?",
-    subtitle = "Negated bigrams can make lyrics seem more positive or more negative than they are."
+    subtitle = "Negated bigrams can make lyrics seem more positive or more negative than they are.",
     caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
     x = "Effect",
     y = "Negated word"
   )+
-  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/negated_bigrams.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-6_negated_bigrams.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
 Note: the blue words make the songs seem eroniously positive, and the red words make it seem eroniously negative. In short, her songs are a lot less positive than they seem at first glance!
 
@@ -259,9 +263,13 @@ a <- grid::arrow(type = "closed", length = unit(.1, "inches"))
 
 ggraph(bigram_graph, layout = "fr") +
   geom_edge_link(aes(edge_alpha = n), arrow = a, show.legend = FALSE)+
-  geom_node_point(color = "cornflowerblue")+
+  geom_node_point(color = beyonce_palette(129)[4])+
   geom_node_text(aes(label = name), vjust = 1, hjust = 1)+
   theme_void()+
+  theme(plot.margin = margin(20,20,20,20),
+        text = element_text(family = main_font),
+        plot.title = element_text(family = title_font, size = 14),
+        plot.title.position = "plot")+
   labs(
     title = "What words are often connected?",
     subtitle = "Connections between the top twenty bigrams",
@@ -269,7 +277,7 @@ ggraph(bigram_graph, layout = "fr") +
     x = NULL,
     y = NULL
   )
-  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/bigram_connections.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
+  ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-7_bigram_connections.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
 Interesting. Lots of words are bigrams with themselves, for example "run", "whoa", "ma", "waiting", and "wow". This makes sense, song lyrics have ltos of repeated words. The other thing that's interesting is that the bigrams aren't more connected. Again, I suppose this makes sense. Songs will have lots of often-repeated combinations of words, especially in the chourus.
 There are also some bigrams that show a relationship in both directions. I suspect that these are phases from the chorus that are repeated back to back. For example, the bigram "gettin" "bodied". In the song "Get Me Bodied", "Gettin' bodied" is repeated over and over. Because line breaks aren't taken into account when creating the bigrams, the both "gettin bodied" and "bodied gettin" appear. This is a weakness in the analysis, since combinations of words that often appear at the end and beginning of lines would be considered bigrams, despite a listener not necessarily considering them connected. 
