@@ -223,6 +223,13 @@ negated_bigrams %>%
   coord_flip()+
   facet_wrap(~word1, scales = "free")+
   scale_x_reordered()+
+  labs(
+    title = "How are negated words influencing sentiment scores?",
+    subtitle = "Negated bigrams can make lyrics seem more positive or more negative than they are."
+    caption = "Data: Tidy Tuesday | Plot: Ben Leamon", 
+    x = "Effect",
+    y = "Negated word"
+  )+
   ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/negated_bigrams.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
 Note: the blue words make the songs seem eroniously positive, and the red words make it seem eroniously negative. In short, her songs are a lot less positive than they seem at first glance!
@@ -255,6 +262,13 @@ ggraph(bigram_graph, layout = "fr") +
   geom_node_point(color = "cornflowerblue")+
   geom_node_text(aes(label = name), vjust = 1, hjust = 1)+
   theme_void()+
+  labs(
+    title = "What words are often connected?",
+    subtitle = "Connections between the top twenty bigrams",
+    caption = "Arrow darkness corresponds to strength of association | Data: Tidy Tuesday | Plot: Ben Leamon", 
+    x = NULL,
+    y = NULL
+  )
   ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/bigram_connections.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
 Interesting. Lots of words are bigrams with themselves, for example "run", "whoa", "ma", "waiting", and "wow". This makes sense, song lyrics have ltos of repeated words. The other thing that's interesting is that the bigrams aren't more connected. Again, I suppose this makes sense. Songs will have lots of often-repeated combinations of words, especially in the chourus.
