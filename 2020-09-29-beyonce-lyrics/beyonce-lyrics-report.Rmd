@@ -163,6 +163,9 @@ lyrics_nrc %>%
   facet_wrap(~sentiment, ncol =1, scales = "free")+
   coord_flip()+
   scale_x_reordered()+
+  labs(
+    title = "What songs are associated with each sentiment?"
+  )
   ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-5_sentiment_by_song.png"), device = "png", type = "cairo", width = width, height = (width*0.618)*2,units = "in", dpi = 300)
 ```
 Lemonade Film (Script) seems to be coming in at the top of many of the negative emotions. 
