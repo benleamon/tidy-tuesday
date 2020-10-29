@@ -168,9 +168,9 @@ lyrics_nrc %>%
   )
   ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-5_sentiment_by_song.png"), device = "png", type = "cairo", width = width, height = (width*0.618)*2,units = "in", dpi = 300)
 ```
-Lemonade Film (Script) seems to be coming in at the top of many of the negative emotions. 
 
 
+Finally, I wanted to look at bigrams, or pairs of words. Specifically, I was inerested in bigrams where the first word in the pair negates the second. 
 ```{r}
 bey_bigrams <- bey_lyrics %>%
   unnest_tokens(bigram, line, token = "ngrams", n = 2) %>%
@@ -186,16 +186,11 @@ filtered_bigrams %>%
 
 ```
 
-Examine bigrams where one word is preceded by something like "not" or another negation.
-Look at: 
-- not
-- don't
 ```{r}
 bey_lyrics %>%
   unnest_tokens(word, line)%>%
   filter(word == "not")
 ```
-OK let's have a look: 
 
 ```{r}
 bing <- get_sentiments("bing")
@@ -239,9 +234,9 @@ negated_bigrams %>%
   )+
   ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-6_negated_bigrams.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
-Note: the blue words make the songs seem eroniously positive, and the red words make it seem eroniously negative. In short, her songs are a lot less positive than they seem at first glance!
+Positive (blue) values represent combinations that make the songs seem falsely positive, and negative (red) values make the songs seem falsely negative, when analyzing individual words alone. In short, her songs are a lot less positive than they seemed at first glance!
 
-
+I also wanted to have a look at some of the top bigrams, and the relationships between them. 
 
 
 [TO DO] Look at some of the suspect words from the sentiments above. For example crazy in the negative ones. If it's in the context of crazy about you, for example, that could be skewing our analysis. 
@@ -282,6 +277,7 @@ ggraph(bigram_graph, layout = "fr") +
   )
   ggsave(filename = here::here("2020-09-29-beyonce-lyrics/figs/fig-7_bigram_connections.png"), device = "png", type = "cairo", width = width, height = width*0.618,units = "in", dpi = 300)
 ```
-Interesting. Lots of words are bigrams with themselves, for example "run", "whoa", "ma", "waiting", and "wow". This makes sense, song lyrics have ltos of repeated words. The other thing that's interesting is that the bigrams aren't more connected. Again, I suppose this makes sense. Songs will have lots of often-repeated combinations of words, especially in the chourus.
-There are also some bigrams that show a relationship in both directions. I suspect that these are phases from the chorus that are repeated back to back. For example, the bigram "gettin" "bodied". In the song "Get Me Bodied", "Gettin' bodied" is repeated over and over. Because line breaks aren't taken into account when creating the bigrams, the both "gettin bodied" and "bodied gettin" appear. This is a weakness in the analysis, since combinations of words that often appear at the end and beginning of lines would be considered bigrams, despite a listener not necessarily considering them connected. 
+Lots of words are bigrams with themselves, for example "run", "whoa", "ma", "waiting", and "wow". This was not the case when I learned how to make this kind of graph with text from eighteenth century novel. In the context of song lyrics, however this makes sense. Lyrics have lots of repeated words. It's also interesting that the bigrams aren't more connected. Again, I suppose this makes sense. Songs will have lots of often-repeated identical combinations of words, especially in the chorus. This is just speculation on my part however, it would be interesting to compare this to other artists. 
+
+There are also some bigrams that show a relationship in both directions. I suspect that these are phases from the chorus that are repeated back to back. For example, the bigram "gettin" "bodied". In the song "Get Me Bodied", "Gettin' bodied" is repeated multiple times. Because line breaks aren't taken into account when creating the bigrams,  both "gettin bodied" and "bodied gettin" appear. This is a weakness in the analysis, since combinations of words that often appear at the end and beginning of lines would be considered bigrams, despite a listener not necessarily considering them connected. 
 
