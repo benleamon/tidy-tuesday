@@ -1,4 +1,5 @@
 #Setup
+library(tidyverse)
 library(lubridate)
 
 #Get this Tuesday 
