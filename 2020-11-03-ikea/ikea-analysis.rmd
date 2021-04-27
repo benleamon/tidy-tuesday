@@ -40,10 +40,34 @@ ikea %>%
 
 What is the distribution of prices within each category? 
 ```{r}
+library(glue)
+library(scales)
 ikea %>%
-  mutate(category = fct_reorder(category, price_usd)) %>%
+  add_count(category, name = "category_total") %>%
+  mutate(category = glue("{category} ({category_total})"),
+        category = fct_reorder(category, price_usd)) %>%
   ggplot(aes(price_usd, category))+
   geom_boxplot()+
-  scale_x_log10()
+  scale_x_log10(labels = dollar) + 
+  labs(x = "Price USD",
+       y = NULL,
+       title = "How expensive are items in each category?")+
+  theme_minimal()
+```
+
+With ridges instead of boxplots
+```{r}
+library(ggridges)
+ikea %>%
+  add_count(category, name = "category_total") %>%
+  mutate(category = glue("{category} ({category_total})"),
+        category = fct_reorder(category, price_usd)) %>%
+  ggplot(aes(price_usd, category))+
+  geom_density_ridges()+
+  scale_x_log10(labels = dollar) + 
+  labs(x = "Price USD",
+       y = NULL,
+       title = "How expensive are items in each category?")+
+  theme_minimal()
 ```
 
