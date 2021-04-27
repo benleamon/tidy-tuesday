@@ -16,3 +16,46 @@ netflix <- tuesdata$netflix_titles
 ```
 proj_path <- "2021-04-20-netflix"
 
+```{r}
+library(tidyverse)
+library(ggrepel)
+```
+
+
+Possible things to look at: 
+
+Number of shows by country by year
+```{r}
+netflix %>% 
+  count(country) %>%
+  filter(n > 1) %>%
+  arrange(desc(n))
+```
+
+```{r}
+netflix %>% 
+  count(country) %>%
+  slice_max(order_by = n, n = 50) %>%
+  arrange(desc(n)) %>%
+  ggplot(aes(n, reorder(country, n)))+
+  geom_col()
+```
+
+Maybe look at what words are most likely to be in the descriptions for each country? Genres by country? Growth over time by country? 
+
+Could be interesting to look at the gap between release year and date added. Maybe add a by country to that as well? 
+```{r}
+netflix %>%
+  count(release_year)%>%
+  arrange(desc(n))
+```
+Looks like the number of shows on netflix pretty solidly tracks age of the show. 
+```{r}
+netflix %>%
+  count(release_year) %>%
+  ggplot(aes(release_year, n, label = release_year))+
+  geom_point()+
+  scale_y_log10()+
+  geom_text_repel()
+```
+Most shows are very recent, with the most titles released a couple years back. 
