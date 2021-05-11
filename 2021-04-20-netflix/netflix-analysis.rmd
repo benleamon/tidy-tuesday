@@ -14,7 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 tuesdata <- tidytuesdayR::tt_load("2021-04-20")
 netflix <- tuesdata$netflix_titles
 ```
+```{r}
 proj_path <- "2021-04-20-netflix"
+```
 
 ```{r}
 library(tidyverse)
@@ -41,9 +43,7 @@ netflix %>%
   geom_col()
 ```
 
-Maybe look at what words are most likely to be in the descriptions for each country? Genres by country? Growth over time by country? 
-
-Could be interesting to look at the gap between release year and date added. Maybe add a by country to that as well? 
+How old are the shows on Netflix? 
 ```{r}
 netflix %>%
   count(release_year)%>%
@@ -59,3 +59,93 @@ netflix %>%
   geom_text_repel()
 ```
 Most shows are very recent, with the most titles released a couple years back. 
+
+Growth over time by country? 
+
+
+Maybe look at what words are most likely to be in the descriptions for each country?
+
+Genres by country?
+```{r}
+interested <- netflix %>%
+  count(country) %>%
+  slice_max(order_by = n, n = 10)
+netflix %>%
+  filter(country %in% interested$country) %>%
+  group_by(country) %>%
+  count(listed_in) %>%
+  ggplot(aes(n, listed_in))+
+  geom_col()+
+  facet_wrap(~country)
+```
+Woah that is a mess. OK it looks like listed_in has too many unique values. Let's try and separate: 
+
+
+Could be interesting to look at the gap between release year and date added. Maybe add a by country to that as well? 
+
+
+# Following David Robinson on youtube
+```{r}
+netflix %>%
+  filter(!is.na(country)) %>%
+  count(country= fct_lump(country, 19),
+        type,
+        sort = TRUE) %>%
+  mutate(country = fct_reorder(country, n)) %>%
+  ggplot(aes(n, country, fill = type)) +
+  geom_col()
+```
+
+# let's try and get top genres by country 
+
+Japan data, to check
+```{r}
+netflix %>% filter(country == "Japan") %>% separate_rows(listed_in, sep = ", ")%>%count(listed_in, sort = TRUE)
+```
+
+```{r}
+library(tidytext)
+
+width <- 6
+title_font <- "Noto Sans Bold"
+main_font <- "NotoSans"
+
+theme_set(theme_minimal())
+theme <- theme_update(
+  text = element_text(family = main_font),
+  plot.title = element_text(family = title_font, size = 14),
+  plot.title.position = "plot",
+  legend.position = "none",
+  axis.title = element_text(size = 8),
+  axis.text = element_text(size = 8),
+  axis.title.x = element_text(family = main_font),
+  axis.title.y = element_text(family = main_font),
+  plot.caption = element_text(family = main_font, size = 8),
+  plot.margin = margin(20,20,20,20)
+  #plot.background = element_rect(fill = "#eceff4")
+)
+
+netflix %>%
+  filter(!is.na(country))%>%
+  separate_rows(listed_in, sep = ", ") %>%
+  filter(! listed_in %in% c("International TV Shows", "International Movies")) %>%
+  count(country = fct_lump(country, 5), listed_in) %>%
+  group_by(country) %>%
+  slice_max(order_by = n, n = 5)%>%
+  ungroup() %>%
+  #mutate(listed_in = reorder_within(listed_in, n, country)) %>%
+  ggplot(aes(n, reorder_within(listed_in, n, country), fill = country))+
+  geom_col(show.legend = FALSE)+
+  facet_wrap(~country, scales="free", ncol = 2)+
+  scale_y_reordered()+
+  labs(
+    title = "What kinds of shows do Netflix buy?",
+    subtitle = "Most common genres from the top five countries on Netflix.",
+    caption = "Excluding 'International TV Shows' and 'International Movies'",
+    x = "Number of shows per genre",
+    y = NULL
+  ) + 
+  ggsave("figs/netflix.png", width = width, height = (width*.618)*2)
+  
+```
+
