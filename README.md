@@ -1,5 +1,5 @@
 # Tidy Tuesday
-Submissions and code for Tidy Tuesday challanges
+Submissions and code for Tidy Tuesday challenges.
 
 ## 2021-04-20 Netflix
 ![Netflix graph netflix.png](2021-04-20-netflix/figs/netflix.png)

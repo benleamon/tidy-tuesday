@@ -1,0 +1,41 @@
+---
+title: "2021-05-11-broadband-analysis"
+author: "Ben Leamon"
+date: "2021-05-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2021-05-11 Tidy Tuesday: Broadband
+```{r}
+tuesdata <- tidytuesdayR::tt_load("2021-05-11")
+```
+```{r setup, include=FALSE}
+proj_path <- "2021-05-11-broadband"
+```
+
+```{r}
+library(tidyverse)
+library(tidytuesdayR)
+library(scales)
+```
+
+
+```{r}
+broadband_county <- tuesdata$broadband %>%
+  janitor::clean_names()%>%
+  rename(state = st)
+
+broadband_zip <- tuesdata$broadband_zip %>%
+  janitor::clean_names() %>%
+  rename(state = st)
+```
+
+```{r}
+broadband_county %>%
+  
+```
+

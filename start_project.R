@@ -97,9 +97,10 @@ script_text <- paste0(
   project_date,
   '-',
   project_name,
+  '"',
   '\n',
   '```',
-  '"'
+  ''
   # This is where to add any more code we want in the new script.
 )
 write(as.character(script_text), file(script_file))
