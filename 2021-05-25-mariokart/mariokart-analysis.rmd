@@ -14,10 +14,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 tuesdata <- tidytuesdayR::tt_load("2021-05-25")
 ```
+
 ```{r setup, include=FALSE}
 proj_path <- "2021-05-25-mariokart"
 records <- tuesdata$records
-drivers <- tuesdata$drivers
+drivers <- tuesdata$drivers 
+```
+
+```{r}
+library(tidyverse)
 ```
 
 
@@ -32,6 +37,7 @@ records %>%
   ggplot(aes(date, time, color = shortcut))+
   geom_point()
 ```
+
 ```{r}
 records %>%
   filter(type == "Three Lap") %>%
@@ -39,6 +45,7 @@ records %>%
   geom_point()+
   facet_wrap(~track)
 ```
+
 ```{r}
 records %>%
   filter(type == "Single Lap") %>%
@@ -47,6 +54,9 @@ records %>%
   facet_wrap(~track)
 ```
 Why does it seem to be either or on this? 
+```{r}
+library(RColorBrewer)
+```
 
 ```{r}
 first_records <- records%>%
@@ -60,13 +70,16 @@ records %>%
   inner_join(first_records, by="track") %>%
   filter(type == "Three Lap") %>%
   mutate(adjusted_time = time - first_time) %>%
-  filter(track == "Toad's Turnpike") %>%
-  #group_by(track, shortcut) %>%
-   ggplot( aes(date, adjusted_time, color = shortcut)) +
+  filter(track %in% c("Toad's Turnpike","Choco Mountain")) %>%
+  ggplot( aes(date, adjusted_time, color = track, group = interaction(track, shortcut))) +
    geom_point()+
-   geom_line()
+   geom_line()#+
+   #scale_colour_brewer(palette = "Paired")
 
-#I think we need to combine shortcut and track, so we would have lines for each permutations 
+
+# To Do: 
+#Get the top, maybe three tracks, color those and label them. 
+# Keep the rest of the lines grey 
 ```
 
 
