@@ -1,0 +1,75 @@
+---
+title: "2021-05-25-mariokart-analysis"
+author: "Ben Leamon"
+date: "2021-05-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# 2021-05-25 Tidy Tuesday: Mario Kart
+```{r}
+tuesdata <- tidytuesdayR::tt_load("2021-05-25")
+```
+```{r setup, include=FALSE}
+proj_path <- "2021-05-25-mariokart"
+records <- tuesdata$records
+drivers <- tuesdata$drivers
+```
+
+
+What do the record durations look like? 
+
+How do the record durations compare between level? In other words, how fast did people get better at each level? 
+
+## Maybe do a time series of all the scores, with branching lines for with and without shortcuts? 
+```{r}
+records %>%
+  filter(track == "Luigi Raceway" & type == "Three Lap") %>%
+  ggplot(aes(date, time, color = shortcut))+
+  geom_point()
+```
+```{r}
+records %>%
+  filter(type == "Three Lap") %>%
+  ggplot(aes(date, time, color = shortcut))+
+  geom_point()+
+  facet_wrap(~track)
+```
+```{r}
+records %>%
+  filter(type == "Single Lap") %>%
+  ggplot(aes(date, time, color = shortcut))+
+  geom_point()+
+  facet_wrap(~track)
+```
+Why does it seem to be either or on this? 
+
+```{r}
+first_records <- records%>%
+  filter(type == "Three Lap") %>%
+  group_by(track) %>%
+  filter(row_number()==1) %>%
+  mutate(first_time = time) %>%
+  select(track, first_time)
+
+records %>%
+  inner_join(first_records, by="track") %>%
+  filter(type == "Three Lap") %>%
+  mutate(adjusted_time = time - first_time) %>%
+  filter(track == "Toad's Turnpike") %>%
+  #group_by(track, shortcut) %>%
+   ggplot( aes(date, adjusted_time, color = shortcut)) +
+   geom_point()+
+   geom_line()
+
+#I think we need to combine shortcut and track, so we would have lines for each permutations 
+```
+
+
+
+## How many records do these people have? 
+
