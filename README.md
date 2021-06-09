@@ -1,6 +1,10 @@
 # Tidy Tuesday
 Submissions and code for Tidy Tuesday challenges.
 
+## 2021-05-25 Mariokart
+![Mariokart graph mario.png](2021-05-25-mariokart/figs/mario.png)
+Code can be found [here](2021-05-25-mariokart). Click for full-size images.
+
 ## 2021-04-20 Netflix
 ![Netflix graph netflix.png](2021-04-20-netflix/figs/netflix.png)
 Code can be found [here](2021-04-20-netflix). Click for full-size images.
