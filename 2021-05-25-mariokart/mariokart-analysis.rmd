@@ -23,6 +23,7 @@ drivers <- tuesdata$drivers
 
 ```{r}
 library(tidyverse)
+library(directlabels)
 ```
 
 
@@ -134,5 +135,3 @@ ggplot() +
 
 
 ## How many records do these people have? 
-
-test test again
