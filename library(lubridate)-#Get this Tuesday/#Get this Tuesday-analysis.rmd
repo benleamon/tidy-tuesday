@@ -1,0 +1,16 @@
+---
+title: "library(lubridate)-#Get this Tuesday-analysis"
+author: "Ben Leamon"
+date: "2021-06-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# library(lubridate) Tidy Tuesday: #Get This Tuesday
+
+```{r setup, include=FALSE}
+proj_path <- "library(lubridate)-#Get this Tuesday"
+```
