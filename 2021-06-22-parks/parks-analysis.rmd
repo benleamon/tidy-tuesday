@@ -20,7 +20,51 @@ proj_path <- "2021-06-22-parks"
 ```
 
 
-# Innitial Ideas: 
+## Innitial Ideas: 
 Could be cool to do a slope graph, see how cities have changed between 2012 and 2020.
 Could do this for budget, or for other metrics. 
 Could be interesting to look at the top and bottom performers for both budget and equity (same as bloomberg article)
+
+
+## A little cleaning
+```{r}
+parks <- parks %>%
+  mutate(spend_per_resident_data = as.numeric(gsub("\\$", "",spend_per_resident_data)))
+```
+
+
+## Top and bottom performers for budget
+```{r}
+parks %>%
+  filter(year == "2020") %>%
+  select(year, city, spend_per_resident_data, spend_per_resident_points) %>%
+  arrange(desc(spend_per_resident_points)) %>%
+  slice(c(1:10, (n() - 10):n() )) %>%
+  mutate(city = fct_reorder(city, spend_per_resident_points)) %>%
+  ggplot(aes(spend_per_resident_points, city))+ 
+  geom_point()
+```
+```{r}
+parks %>%
+  filter(year == "2020") %>%
+  select(year, city, spend_per_resident_data, spend_per_resident_points) %>%
+  arrange(desc(spend_per_resident_data)) %>%
+  slice(c(1:10, (n() - 10):n() )) %>%
+  #mutate(full_marks = )%>%
+  mutate(city = fct_reorder(city, spend_per_resident_data)) %>%
+  ggplot(aes(spend_per_resident_data, city))+ 
+  geom_point()
+```
+```{r}
+parks %>%
+  filter(year == "2020") %>%
+  #select(year, city, spend_per_resident_data, spend_per_resident_points) %>%
+  arrange(desc(total_pct)) %>%
+  slice(c(1:10, (n() - 10):n() )) %>%
+  #mutate(full_marks = )%>%
+  mutate(city = fct_reorder(city, total_pct)) %>%
+  ggplot(aes(total_pct, city, size = spend_per_resident_data))+ 
+  geom_point()
+```
+Look at spending vs total pct 
+
