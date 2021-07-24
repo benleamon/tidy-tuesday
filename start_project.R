@@ -99,6 +99,10 @@ script_text <- paste0(
   project_name,
   '"',
   '\n',
+  'entry_caption <- ""',
+  '\n',
+  'library(tidyverse)',
+  '\n',
   '```',
   ''
   # This is where to add any more code we want in the new script.

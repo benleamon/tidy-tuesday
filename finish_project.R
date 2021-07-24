@@ -23,6 +23,9 @@ for (i in figs) {
   readme_lines <- c(readme_lines, 
                     paste0("![",clean_name," graph ",i,"](",name_date,"/figs/",i,")"))
 }
+## Add caption
+readme_lines <- c(readme_lines, paste0(entry_caption))
+
 ## Link to code at end of figs 
 readme_lines <- c(readme_lines, paste0("Code can be found [here](", name_date,"). Click for full-size images."))
 

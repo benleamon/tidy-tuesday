@@ -13,10 +13,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 tuesdata <- tidytuesdayR::tt_load("2021-06-22")
 parks <- tuesdata$parks
+library(tidyverse)
 ```
 
 ```{r setup, include=FALSE}
 proj_path <- "2021-06-22-parks"
+entry_caption <- "Busy week this week, so I settled for recreating one of the example charts."
 ```
 
 
@@ -45,6 +47,25 @@ parks %>%
   geom_point()
 ```
 ```{r}
+width <- 6
+title_font <- "Noto Sans Bold"
+main_font <- "NotoSans"
+
+theme_set(theme_minimal())
+theme <- theme_update(
+  text = element_text(family = main_font),
+  plot.title = element_text(family = title_font, size = 14),
+  plot.title.position = "plot",
+  legend.position = "none",
+  axis.title = element_text(size = 8),
+  axis.text = element_text(size = 8),
+  axis.title.x = element_text(family = main_font),
+  axis.title.y = element_text(family = main_font),
+  plot.caption = element_text(family = main_font, size = 8),
+  plot.margin = margin(20,20,20,20)
+  #plot.background = element_rect(fill = "#eceff4")
+)
+
 parks %>%
   filter(year == "2020") %>%
   select(year, city, spend_per_resident_data, spend_per_resident_points) %>%
@@ -53,8 +74,19 @@ parks %>%
   #mutate(full_marks = )%>%
   mutate(city = fct_reorder(city, spend_per_resident_data)) %>%
   ggplot(aes(spend_per_resident_data, city))+ 
-  geom_point()
+  geom_point()+ 
+  labs(
+    title = "Which cities spend the most (and least) on parks?",
+    subtitle = "Spending per resident on parks in top-ten and bottom-ten cities", 
+    x = "Spending per Resident (USD)", 
+    y = NULL
+  )
+  ggsave("figs/parks.png", device = "png",width = width, height = (width*.618))
 ```
+
+
+
+
 ```{r}
 parks %>%
   filter(year == "2020") %>%
@@ -67,4 +99,12 @@ parks %>%
   geom_point()
 ```
 Look at spending vs total pct 
+
+```{r}
+parks %>%
+  filter(year == "2020") %>%
+  ggplot(aes(spend_per_resident_data, total_pct)) +
+  geom_point()+
+  coord_flip()
+```
 
