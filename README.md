@@ -2,7 +2,7 @@
 Submissions and code for Tidy Tuesday challenges.
 
 ## 2021-06-22 Parks
-![Parks graph mario.png](2021-06-22-parks/figs/mario.png)
+![Parks graph parks.png](2021-06-22-parks/figs/parks.png)
 Busy week this week, so I settled for recreating one of the example charts.
 Code can be found [here](2021-06-22-parks). Click for full-size images.
 
