@@ -1,0 +1,20 @@
+---
+title: "2022-05-24-eurovision-analysis"
+author: "Ben Leamon"
+date: "2022-05-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2022-05-24 Tidy Tuesday: Eurovision
+```{r}
+tuesdata <- tidytuesdayR::tt_load("2022-05-24")
+```
+```{r setup, include=FALSE}
+proj_path <- "2022-05-24-eurovision"
+entry_caption <- ""
+library(tidyverse)
+```
