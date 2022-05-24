@@ -1,0 +1,31 @@
+---
+title: "2022-05-17-eurovision-analysis"
+author: "Ben Leamon"
+date: "2022-05-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2022-05-17 Tidy Tuesday: Eurovision
+```{r}
+tuesdata <- tidytuesdayR::tt_load("2022-05-17")
+```
+```{r setup, include=FALSE}
+proj_path <- "2022-05-17-eurovision"
+entry_caption <- ""
+library(tidyverse)
+```
+
+
+```{r}
+eurovision <- tuesdata$eurovision
+```
+
+# Maybe to keep things as simple as possible, let's start by just plotting wins by country. 
+```{r}
+
+```
+
